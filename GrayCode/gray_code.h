@@ -1,29 +1,65 @@
 #pragma once
 
-enum Bit{ Zero, One };
-
 template<int T>
 class gray_code
 {
 public:
-	gray_code(const std::bitset<T>& gray);
-	static gray_code from_binary(const std::bitset<T>& binary);
-	static gray_code from_gray(const std::bitset<T>& gray);
-	static gray_code from_integer(unsigned int a);
-	static gray_code from_string(const std::string& s);
+	gray_code();
+	gray_code(const std::bitset<T>& binary);
+	gray_code(unsigned int a);
+	gray_code(const std::string& s);
+	gray_code(const gray_code<T>& other);
 	~gray_code(){};
+
 	void print_gray() const;
 	void print_binary() const;
-	gray_code increment() const;
+
+	std::bitset<T> getGray() const;
+	std::bitset<T> getBinary() const;
+
+	void operator=(const gray_code<T>& other);
+
+	void increment(unsigned int count = 1);
+	void decrement(unsigned int count = 1);
 private:
 	std::bitset<T> gray_;
 	std::bitset<T> binary_;
+
+	void computeGray();
+	void computeBinary();
 };
 
 
+template<int T>
+gray_code<T>::gray_code()
+{
+}
 
 template<int T>
-gray_code<T>::gray_code(const std::bitset<T>& gray) : gray_(gray), binary_()
+gray_code<T>::gray_code(const gray_code<T>& other) : gray_(other.getGray), binary_(other.getBinary)
+{
+}
+
+template<int T>
+gray_code<T>::gray_code(const std::bitset<T>& binary) : binary_(binary)
+{
+	computeGray();
+}
+
+template<int T>
+gray_code<T>::gray_code(unsigned int a) : binary_(a)
+{
+	computeGray();
+}
+
+template<int T>
+gray_code<T>::gray_code(const std::string& s) : binary_(s)
+{
+	computeGray();
+}
+
+template<int T>
+void gray_code<T>::computeBinary()
 {
 	for (int i = gray_.size() - 1; i >= 0; i--){
 		if (i == gray_.size() - 1){
@@ -41,44 +77,48 @@ gray_code<T>::gray_code(const std::bitset<T>& gray) : gray_(gray), binary_()
 }
 
 template<int T>
-gray_code<T> gray_code<T>::from_binary(const std::bitset<T>& binary)
+void gray_code<T>::computeGray()
 {
-	std::bitset<T> gray;
-	for (int i = binary.size() - 1; i >= 0; i--){
-		if (i == binary.size() - 1){
-			gray[binary.size() - 1] = binary[binary.size() - 1];
+	for (int i = binary_.size() - 1; i >= 0; i--){
+		if (i == binary_.size() - 1){
+			gray_[binary_.size() - 1] = binary_[binary_.size() - 1];
 		}
 		else {
-			gray[i] = (binary[i] ^ binary[i + 1]);
+			gray_[i] = (binary_[i] ^ binary_[i + 1]);
 		}
-	}
-	return gray_code(gray);
+	};
 }
 
-
 template<int T>
-gray_code<T> gray_code<T>::from_gray(const std::bitset<T>& gray)
+std::bitset<T> gray_code<T>::getGray() const
 {
-	return gray_code(gray);
+	return gray_;
 }
 
 template<int T>
-gray_code<T> gray_code<T>::from_integer(unsigned int a)
+std::bitset<T> gray_code<T>::getBinary() const
 {
-	return gray_code::from_binary(std::bitset<T>(a));
+	return binary_;
 }
 
 template<int T>
-gray_code<T> gray_code<T>::from_string(const std::string& s)
+void gray_code<T>::operator=(const gray_code<T>& other)
 {
-	return gray_code::from_binary(std::bitset<T>(s));
+	gray_ = other.gray_;
+	binary_ = other.binary_;
 }
 
 template<int T>
-gray_code<T> gray_code<T>::increment() const {
-	return gray_code::from_integer(int(binary_.to_ulong()) + 1);
+void gray_code<T>::increment(unsigned int count) {
+	binary_ = std::bitset<T>(binary_.to_ulong() + count);
+	computeGray();
 }
 
+template<int T>
+void gray_code<T>::decrement(unsigned int count) {
+	binary_ = std::bitset<T>(binary_.to_ulong() - count);
+	computeGray();
+}
 
 template<int T>
 void gray_code<T>::print_gray() const
