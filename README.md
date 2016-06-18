@@ -5,4 +5,6 @@ gray_code class allows initialization and manipulation of [Gray code](https://en
 
 Gray code can be constructed from binary, integer or string of bits and incremented/decremented.
 
+The class uses std::bitset as a container for the bits.
+
 
